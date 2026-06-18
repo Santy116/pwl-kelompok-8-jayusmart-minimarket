@@ -1,20 +1,59 @@
 <?php
 
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::resource('branches', BranchController::class);
+
+    Route::resource('products', ProductController::class);
+
+    Route::get('/stocks', [StockController::class, 'index'])
+        ->name('stocks.index');
+
+    Route::post('/stocks/movement', [StockController::class, 'storeMovement'])
+        ->name('stocks.movement.store');
+
+    Route::resource('transactions', TransactionController::class)
+        ->only(['index', 'create', 'store', 'show']);
+
+    Route::get('/reports/transactions', [ReportController::class, 'transactions'])
+        ->name('reports.transactions');
+
+    Route::get('/reports/transactions/pdf', [ReportController::class, 'transactionsPdf'])
+        ->name('reports.transactions.pdf');
+
+    Route::get('/reports/stocks', [ReportController::class, 'stocks'])
+        ->name('reports.stocks');
+
+    Route::get('/reports/stocks/pdf', [ReportController::class, 'stocksPdf'])
+        ->name('reports.stocks.pdf');
+
+    Route::resource('users', UserManagementController::class)
+        ->except(['show']);
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';
