@@ -123,6 +123,19 @@ class TransactionController extends Controller
         ]);
     }
 
+    public function invoice(Transaction $transaction): View
+    {
+        $transaction->load([
+            'branch',
+            'user',
+            'transactionItems.product',
+        ]);
+
+        return view('transactions.invoice', [
+            'transaction' => $transaction,
+        ]);
+    }
+
     private function generateInvoiceNumber(): string
     {
         $date = now()->format('Ymd');

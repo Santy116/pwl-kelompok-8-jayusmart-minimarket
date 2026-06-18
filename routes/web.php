@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('transactions', TransactionController::class)
         ->only(['index', 'create', 'store', 'show']);
 
+    Route::get('/transactions/{transaction}/invoice', [TransactionController::class, 'invoice'])
+        ->name('transactions.invoice');
+
     Route::get('/reports/transactions', [ReportController::class, 'transactions'])
         ->name('reports.transactions');
 
