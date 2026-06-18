@@ -15,8 +15,13 @@ class StockController extends Controller
 {
     public function index(Request $request): View
     {
+        $user = $request->user();
+
         $stocks = Stock::with(['branch', 'product.category'])
-            ->when($request->branch_id, function ($query, $branchId) {
+            ->when(! $user->hasRole('owner'), function ($query) use ($user) {
+                $query->where('branch_id', $user->branch_id);
+            })
+            ->when($user->hasRole('owner') && $request->branch_id, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
             ->when($request->product_id, function ($query, $productId) {
@@ -26,9 +31,13 @@ class StockController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $branches = $user->hasRole('owner')
+            ? Branch::orderBy('name')->get()
+            : Branch::where('id', $user->branch_id)->get();
+
         return view('stocks.index', [
             'stocks' => $stocks,
-            'branches' => Branch::orderBy('name')->get(),
+            'branches' => $branches,
             'products' => Product::orderBy('name')->get(),
         ]);
     }
@@ -36,6 +45,11 @@ class StockController extends Controller
     public function storeMovement(StoreStockMovementRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $user = $request->user();
+
+        if (! $user->hasRole('owner')) {
+            $validated['branch_id'] = $user->branch_id;
+        }
 
         $stock = Stock::firstOrCreate(
             [
@@ -71,7 +85,7 @@ class StockController extends Controller
         StockMovement::create([
             'branch_id' => $validated['branch_id'],
             'product_id' => $validated['product_id'],
-            'user_id' => $request->user()->id,
+            'user_id' => $user->id,
             'transaction_id' => null,
             'type' => $validated['type'],
             'quantity' => $validated['quantity'],

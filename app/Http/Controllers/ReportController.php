@@ -20,7 +20,7 @@ class ReportController extends Controller
 
         return view('reports.transactions', [
             'transactions' => $transactions,
-            'branches' => Branch::orderBy('name')->get(),
+            'branches' => $this->availableBranches($request),
             'filters' => $request->only([
                 'branch_id',
                 'start_date',
@@ -55,7 +55,7 @@ class ReportController extends Controller
 
         return view('reports.stocks', [
             'stocks' => $stocks,
-            'branches' => Branch::orderBy('name')->get(),
+            'branches' => $this->availableBranches($request),
             'products' => Product::orderBy('name')->get(),
             'filters' => $request->only([
                 'branch_id',
@@ -81,8 +81,13 @@ class ReportController extends Controller
 
     private function transactionQuery(Request $request)
     {
+        $user = $request->user();
+
         return Transaction::with(['branch', 'user'])
-            ->when($request->branch_id, function ($query, $branchId) {
+            ->when(! $user->hasRole('owner'), function ($query) use ($user) {
+                $query->where('branch_id', $user->branch_id);
+            })
+            ->when($user->hasRole('owner') && $request->branch_id, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
             ->when($request->start_date, function ($query, $startDate) {
@@ -99,13 +104,29 @@ class ReportController extends Controller
 
     private function stockQuery(Request $request)
     {
+        $user = $request->user();
+
         return Stock::with(['branch', 'product.category'])
-            ->when($request->branch_id, function ($query, $branchId) {
+            ->when(! $user->hasRole('owner'), function ($query) use ($user) {
+                $query->where('branch_id', $user->branch_id);
+            })
+            ->when($user->hasRole('owner') && $request->branch_id, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
             ->when($request->product_id, function ($query, $productId) {
                 $query->where('product_id', $productId);
             })
             ->latest();
+    }
+
+    private function availableBranches(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->hasRole('owner')) {
+            return Branch::orderBy('name')->get();
+        }
+
+        return Branch::where('id', $user->branch_id)->get();
     }
 }

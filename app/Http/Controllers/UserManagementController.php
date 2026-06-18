@@ -16,7 +16,15 @@ class UserManagementController extends Controller
 {
     public function index(Request $request): View
     {
+        $authUser = $request->user();
+
         $users = User::with(['branch', 'roles'])
+            ->when(! $authUser->hasRole('owner'), function ($query) use ($authUser) {
+                $query->where('branch_id', $authUser->branch_id)
+                    ->whereDoesntHave('roles', function ($query) {
+                        $query->where('name', 'owner');
+                    });
+            })
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
@@ -26,7 +34,7 @@ class UserManagementController extends Controller
             ->when($request->role, function ($query, $role) {
                 $query->role($role);
             })
-            ->when($request->branch_id, function ($query, $branchId) {
+            ->when($authUser->hasRole('owner') && $request->branch_id, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
             ->latest()
@@ -35,22 +43,33 @@ class UserManagementController extends Controller
 
         return view('users.index', [
             'users' => $users,
-            'roles' => Role::orderBy('name')->get(),
-            'branches' => Branch::orderBy('name')->get(),
+            'roles' => $this->availableRoles($authUser),
+            'branches' => $this->availableBranches($authUser),
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $authUser = $request->user();
+
         return view('users.create', [
-            'roles' => Role::orderBy('name')->get(),
-            'branches' => Branch::orderBy('name')->get(),
+            'roles' => $this->availableRoles($authUser),
+            'branches' => $this->availableBranches($authUser),
         ]);
     }
 
     public function store(StoreUserRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $authUser = $request->user();
+
+        if (! $authUser->hasRole('owner')) {
+            $validated['branch_id'] = $authUser->branch_id;
+
+            if (! in_array($validated['role'], ['supervisor', 'cashier', 'warehouse'], true)) {
+                abort(403);
+            }
+        }
 
         $user = User::create([
             'branch_id' => $validated['branch_id'] ?? null,
@@ -66,20 +85,35 @@ class UserManagementController extends Controller
             ->with('success', 'User berhasil ditambahkan.');
     }
 
-    public function edit(User $user): View
+    public function edit(Request $request, User $user): View
     {
+        $this->authorizeUserAccess($request, $user);
+
+        $authUser = $request->user();
+
         $user->load(['branch', 'roles']);
 
         return view('users.edit', [
             'user' => $user,
-            'roles' => Role::orderBy('name')->get(),
-            'branches' => Branch::orderBy('name')->get(),
+            'roles' => $this->availableRoles($authUser),
+            'branches' => $this->availableBranches($authUser),
         ]);
     }
 
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
+        $this->authorizeUserAccess($request, $user);
+
         $validated = $request->validated();
+        $authUser = $request->user();
+
+        if (! $authUser->hasRole('owner')) {
+            $validated['branch_id'] = $authUser->branch_id;
+
+            if (! in_array($validated['role'], ['supervisor', 'cashier', 'warehouse'], true)) {
+                abort(403);
+            }
+        }
 
         $data = [
             'branch_id' => $validated['branch_id'] ?? null,
@@ -101,6 +135,8 @@ class UserManagementController extends Controller
 
     public function destroy(Request $request, User $user): RedirectResponse
     {
+        $this->authorizeUserAccess($request, $user);
+
         if ($request->user()->id === $user->id) {
             return redirect()
                 ->route('users.index')
@@ -112,5 +148,40 @@ class UserManagementController extends Controller
         return redirect()
             ->route('users.index')
             ->with('success', 'User berhasil dihapus.');
+    }
+
+    private function authorizeUserAccess(Request $request, User $user): void
+    {
+        $authUser = $request->user();
+
+        if ($authUser->hasRole('owner')) {
+            return;
+        }
+
+        if ($user->branch_id !== $authUser->branch_id || $user->hasRole('owner')) {
+            abort(403);
+        }
+    }
+
+    private function availableRoles(User $authUser)
+    {
+        if ($authUser->hasRole('owner')) {
+            return Role::orderBy('name')->get();
+        }
+
+        return Role::whereIn('name', [
+            'supervisor',
+            'cashier',
+            'warehouse',
+        ])->orderBy('name')->get();
+    }
+
+    private function availableBranches(User $authUser)
+    {
+        if ($authUser->hasRole('owner')) {
+            return Branch::orderBy('name')->get();
+        }
+
+        return Branch::where('id', $authUser->branch_id)->get();
     }
 }

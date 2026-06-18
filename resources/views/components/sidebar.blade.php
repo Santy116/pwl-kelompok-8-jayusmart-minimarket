@@ -12,40 +12,54 @@
             Dashboard
         </a>
 
-        <a href="{{ route('branches.index') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('branches.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            Cabang
-        </a>
+        @if (auth()->user()?->hasRole('owner'))
+            <a href="{{ route('branches.index') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('branches.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Cabang
+            </a>
+        @endif
 
-        <a href="{{ route('products.index') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('products.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            Produk
-        </a>
+        @if (auth()->user()?->hasAnyRole(['owner', 'manager', 'warehouse']))
+            <a href="{{ route('products.index') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('products.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Produk
+            </a>
+        @endif
 
-        <a href="{{ route('stocks.index') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('stocks.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            Stok Barang
-        </a>
+        @if (auth()->user()?->hasAnyRole(['owner', 'manager', 'supervisor', 'warehouse']))
+            <a href="{{ route('stocks.index') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('stocks.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Stok Barang
+            </a>
+        @endif
 
-        <a href="{{ route('transactions.index') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('transactions.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            Transaksi
-        </a>
+        @if (auth()->user()?->hasAnyRole(['owner', 'supervisor', 'cashier']))
+            <a href="{{ route('transactions.index') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('transactions.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Transaksi
+            </a>
+        @endif
 
-        <a href="{{ route('reports.transactions') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('reports.transactions*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            Laporan Transaksi
-        </a>
+        @if (auth()->user()?->hasAnyRole(['owner', 'manager', 'supervisor']))
+            <a href="{{ route('reports.transactions') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('reports.transactions*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Laporan Transaksi
+            </a>
+        @endif
 
-        <a href="{{ route('reports.stocks') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('reports.stocks*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            Laporan Stok
-        </a>
+        @if (auth()->user()?->hasAnyRole(['owner', 'manager', 'supervisor', 'warehouse']))
+            <a href="{{ route('reports.stocks') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('reports.stocks*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Laporan Stok
+            </a>
+        @endif
 
-        <a href="{{ route('users.index') }}"
-           class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('users.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            User Management
-        </a>
+        @if (auth()->user()?->hasAnyRole(['owner', 'manager']))
+            <a href="{{ route('users.index') }}"
+               class="flex items-center rounded-lg px-4 py-2.5 {{ request()->routeIs('users.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                User Management
+            </a>
+        @endif
 
         <form method="POST" action="{{ route('logout') }}" class="pt-4">
             @csrf

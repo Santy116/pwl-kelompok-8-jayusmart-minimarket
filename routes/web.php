@@ -18,36 +18,52 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    Route::resource('branches', BranchController::class);
+    Route::middleware(['role:owner'])->group(function () {
+        Route::resource('branches', BranchController::class);
+    });
 
-    Route::resource('products', ProductController::class);
+    Route::middleware(['role:owner|manager|warehouse'])->group(function () {
+        Route::resource('products', ProductController::class);
+    });
 
-    Route::get('/stocks', [StockController::class, 'index'])
-        ->name('stocks.index');
+    Route::middleware(['role:owner|manager|supervisor|warehouse'])->group(function () {
+        Route::get('/stocks', [StockController::class, 'index'])
+            ->name('stocks.index');
+    });
 
-    Route::post('/stocks/movement', [StockController::class, 'storeMovement'])
-        ->name('stocks.movement.store');
+    Route::middleware(['role:owner|manager|warehouse'])->group(function () {
+        Route::post('/stocks/movement', [StockController::class, 'storeMovement'])
+            ->name('stocks.movement.store');
+    });
 
-    Route::resource('transactions', TransactionController::class)
-        ->only(['index', 'create', 'store', 'show']);
+    Route::middleware(['role:owner|supervisor|cashier'])->group(function () {
+        Route::resource('transactions', TransactionController::class)
+            ->only(['index', 'create', 'store', 'show']);
 
-    Route::get('/transactions/{transaction}/invoice', [TransactionController::class, 'invoice'])
-        ->name('transactions.invoice');
+        Route::get('/transactions/{transaction}/invoice', [TransactionController::class, 'invoice'])
+            ->name('transactions.invoice');
+    });
 
-    Route::get('/reports/transactions', [ReportController::class, 'transactions'])
-        ->name('reports.transactions');
+    Route::middleware(['role:owner|manager|supervisor'])->group(function () {
+        Route::get('/reports/transactions', [ReportController::class, 'transactions'])
+            ->name('reports.transactions');
 
-    Route::get('/reports/transactions/pdf', [ReportController::class, 'transactionsPdf'])
-        ->name('reports.transactions.pdf');
+        Route::get('/reports/transactions/pdf', [ReportController::class, 'transactionsPdf'])
+            ->name('reports.transactions.pdf');
+    });
 
-    Route::get('/reports/stocks', [ReportController::class, 'stocks'])
-        ->name('reports.stocks');
+    Route::middleware(['role:owner|manager|supervisor|warehouse'])->group(function () {
+        Route::get('/reports/stocks', [ReportController::class, 'stocks'])
+            ->name('reports.stocks');
 
-    Route::get('/reports/stocks/pdf', [ReportController::class, 'stocksPdf'])
-        ->name('reports.stocks.pdf');
+        Route::get('/reports/stocks/pdf', [ReportController::class, 'stocksPdf'])
+            ->name('reports.stocks.pdf');
+    });
 
-    Route::resource('users', UserManagementController::class)
-        ->except(['show']);
+    Route::middleware(['role:owner|manager'])->group(function () {
+        Route::resource('users', UserManagementController::class)
+            ->except(['show']);
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
