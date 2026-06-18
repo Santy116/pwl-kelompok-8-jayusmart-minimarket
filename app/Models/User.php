@@ -25,6 +25,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
