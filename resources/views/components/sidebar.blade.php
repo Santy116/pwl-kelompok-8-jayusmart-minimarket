@@ -1,8 +1,12 @@
 <aside class="hidden w-64 shrink-0 border-r border-slate-200 bg-slate-900 text-white lg:block">
     <div class="flex h-16 items-center border-b border-slate-800 px-6">
         <div>
-            <h1 class="text-lg font-bold tracking-wide">Jayusmart</h1>
-            <p class="text-xs text-slate-400">Monitoring Minimarket</p>
+            <h1 class="text-lg font-bold tracking-wide">
+                Jayusmart
+            </h1>
+            <p class="text-xs text-slate-400">
+                Admin Dashboard
+            </p>
         </div>
     </div>
 
@@ -61,13 +65,17 @@
             </a>
         @endif
 
-        <form method="POST" action="{{ route('logout') }}" class="pt-4">
-            @csrf
+        <div class="pt-4">
+            <div class="border-t border-slate-800 pt-4">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
 
-            <button type="submit"
-                    class="flex w-full items-center rounded-lg px-4 py-2.5 text-left text-slate-300 hover:bg-red-600 hover:text-white">
-                Logout
-            </button>
-        </form>
+                    <button type="submit"
+                            class="flex w-full items-center rounded-lg px-4 py-2.5 text-left text-slate-300 hover:bg-red-600 hover:text-white">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
     </nav>
 </aside>
