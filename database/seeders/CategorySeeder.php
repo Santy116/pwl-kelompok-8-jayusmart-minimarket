@@ -16,11 +16,11 @@ class CategorySeeder extends Seeder
             ],
             [
                 'name' => 'Minuman',
-                'description' => 'Produk minuman kemasan.',
+                'description' => 'Produk minuman kemasan dan minuman ringan.',
             ],
             [
                 'name' => 'Makanan Ringan',
-                'description' => 'Produk snack dan makanan ringan.',
+                'description' => 'Produk snack, roti, dan camilan.',
             ],
             [
                 'name' => 'Kebersihan',
@@ -28,7 +28,19 @@ class CategorySeeder extends Seeder
             ],
             [
                 'name' => 'Perawatan Diri',
-                'description' => 'Produk perawatan tubuh dan kesehatan ringan.',
+                'description' => 'Produk perawatan tubuh dan kebutuhan pribadi.',
+            ],
+            [
+                'name' => 'Bumbu Dapur',
+                'description' => 'Produk bumbu masak dan pelengkap dapur.',
+            ],
+            [
+                'name' => 'Produk Instan',
+                'description' => 'Produk makanan dan minuman instan.',
+            ],
+            [
+                'name' => 'Perlengkapan Rumah',
+                'description' => 'Produk perlengkapan sederhana untuk rumah tangga.',
             ],
         ];
 
