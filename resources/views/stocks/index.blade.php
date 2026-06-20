@@ -1,20 +1,10 @@
 <x-app-layout>
+    <x-slot:title>Stok Barang</x-slot:title>
+
     <div class="space-y-6">
-        <div>
-            <x-breadcrumb :items="[
-                'Stok Barang' => null,
-            ]" />
-
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">
-                    Manajemen Stok Barang
-                </h1>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Pantau stok produk pada setiap cabang dan catat pergerakan stok masuk, keluar, atau adjustment.
-                </p>
-            </div>
-        </div>
+        <p class="text-sm text-slate-500">
+            Pantau stok produk pada setiap cabang dan catat pergerakan stok masuk, keluar, atau adjustment.
+        </p>
 
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 class="text-lg font-semibold text-slate-900">
