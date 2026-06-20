@@ -15,7 +15,7 @@
             <x-sidebar />
 
             <div class="flex min-h-screen flex-1 flex-col">
-                <x-navbar />
+                <x-navbar :pageTitle="$title ?? null" />
 
                 <main class="flex-1 px-6 py-6">
                     @if (session('success'))
