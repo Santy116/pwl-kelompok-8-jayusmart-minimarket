@@ -18,10 +18,13 @@ class RolePermissionSeeder extends Seeder
             'manage branches',
             'manage products',
             'manage stocks',
+            'manage stock movements',
             'manage transactions',
+            'view invoices',
             'view transaction reports',
             'view stock reports',
             'manage users',
+            'manage profile',
             'print reports',
         ];
 
@@ -63,31 +66,39 @@ class RolePermissionSeeder extends Seeder
             'view dashboard',
             'manage products',
             'manage stocks',
+            'manage stock movements',
             'view transaction reports',
             'view stock reports',
             'manage users',
+            'manage profile',
             'print reports',
         ]);
 
         $supervisor->syncPermissions([
             'view dashboard',
-            'manage transactions',
             'manage stocks',
+            'manage transactions',
+            'view invoices',
             'view transaction reports',
             'view stock reports',
+            'manage profile',
             'print reports',
         ]);
 
         $cashier->syncPermissions([
             'view dashboard',
             'manage transactions',
+            'view invoices',
+            'manage profile',
         ]);
 
         $warehouse->syncPermissions([
             'view dashboard',
             'manage products',
             'manage stocks',
+            'manage stock movements',
             'view stock reports',
+            'manage profile',
             'print reports',
         ]);
     }
