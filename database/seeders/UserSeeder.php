@@ -17,11 +17,44 @@ class UserSeeder extends Seeder
             [
                 'branch_id' => null,
                 'name' => 'Bapak Jayusman',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Owner@Jayusmart2026'),
             ]
         );
 
         $owner->syncRoles(['owner']);
+
+        $branchPasswords = [
+            'bandung' => [
+                'manager' => 'ManagerBandung@2026',
+                'supervisor' => 'SupervisorBandung@2026',
+                'cashier' => 'CashierBandung@2026',
+                'warehouse' => 'WarehouseBandung@2026',
+            ],
+            'jakarta' => [
+                'manager' => 'ManagerJakarta@2026',
+                'supervisor' => 'SupervisorJakarta@2026',
+                'cashier' => 'CashierJakarta@2026',
+                'warehouse' => 'WarehouseJakarta@2026',
+            ],
+            'bogor' => [
+                'manager' => 'ManagerBogor@2026',
+                'supervisor' => 'SupervisorBogor@2026',
+                'cashier' => 'CashierBogor@2026',
+                'warehouse' => 'WarehouseBogor@2026',
+            ],
+            'depok' => [
+                'manager' => 'ManagerDepok@2026',
+                'supervisor' => 'SupervisorDepok@2026',
+                'cashier' => 'CashierDepok@2026',
+                'warehouse' => 'WarehouseDepok@2026',
+            ],
+            'bekasi' => [
+                'manager' => 'ManagerBekasi@2026',
+                'supervisor' => 'SupervisorBekasi@2026',
+                'cashier' => 'CashierBekasi@2026',
+                'warehouse' => 'WarehouseBekasi@2026',
+            ],
+        ];
 
         $branches = Branch::orderBy('id')->get();
 
@@ -33,7 +66,7 @@ class UserSeeder extends Seeder
                 [
                     'branch_id' => $branch->id,
                     'name' => "Manager {$branch->city}",
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make($branchPasswords[$slug]['manager']),
                 ]
             );
 
@@ -44,7 +77,7 @@ class UserSeeder extends Seeder
                 [
                     'branch_id' => $branch->id,
                     'name' => "Supervisor {$branch->city}",
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make($branchPasswords[$slug]['supervisor']),
                 ]
             );
 
@@ -55,7 +88,7 @@ class UserSeeder extends Seeder
                 [
                     'branch_id' => $branch->id,
                     'name' => "Cashier {$branch->city}",
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make($branchPasswords[$slug]['cashier']),
                 ]
             );
 
@@ -66,7 +99,7 @@ class UserSeeder extends Seeder
                 [
                     'branch_id' => $branch->id,
                     'name' => "Warehouse {$branch->city}",
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make($branchPasswords[$slug]['warehouse']),
                 ]
             );
 

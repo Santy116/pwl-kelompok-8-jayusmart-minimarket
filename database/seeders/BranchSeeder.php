@@ -19,7 +19,7 @@ class BranchSeeder extends Seeder
             [
                 'name' => 'Jayusmart Jakarta',
                 'city' => 'Jakarta',
-                'address' => 'Jl. Sudirman No. 15, Jakarta',
+                'address' => 'Jl. Jenderal Sudirman No. 15, Jakarta',
                 'phone' => '0211234567',
             ],
             [

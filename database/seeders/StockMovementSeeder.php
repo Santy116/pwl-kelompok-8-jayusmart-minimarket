@@ -16,24 +16,29 @@ class StockMovementSeeder extends Seeder
 
         foreach ($transactions as $transaction) {
             foreach ($transaction->transactionItems as $item) {
-                StockMovement::create([
-                    'branch_id' => $transaction->branch_id,
-                    'product_id' => $item->product_id,
-                    'user_id' => $transaction->user_id,
-                    'transaction_id' => $transaction->id,
-                    'type' => 'out',
-                    'quantity' => $item->quantity,
-                    'movement_date' => $transaction->transaction_date,
-                    'description' => 'Stok keluar dari transaksi penjualan.',
-                ]);
+                StockMovement::updateOrCreate(
+                    [
+                        'transaction_id' => $transaction->id,
+                        'product_id' => $item->product_id,
+                    ],
+                    [
+                        'branch_id' => $transaction->branch_id,
+                        'user_id' => $transaction->user_id,
+                        'type' => 'out',
+                        'quantity' => $item->quantity,
+                        'movement_date' => $transaction->transaction_date,
+                        'description' => 'Stok keluar dari transaksi penjualan.',
+                    ]
+                );
             }
         }
 
         $stocks = Stock::with(['branch', 'product'])
-            ->limit(10)
+            ->orderBy('branch_id')
+            ->orderBy('product_id')
             ->get();
 
-        foreach ($stocks as $stock) {
+        foreach ($stocks as $index => $stock) {
             $warehouse = User::role('warehouse')
                 ->where('branch_id', $stock->branch_id)
                 ->first();
@@ -42,18 +47,41 @@ class StockMovementSeeder extends Seeder
                 continue;
             }
 
-            $stock->increment('quantity', 20);
+            $incomingQuantity = 20 + ($index % 15);
 
-            StockMovement::create([
-                'branch_id' => $stock->branch_id,
-                'product_id' => $stock->product_id,
-                'user_id' => $warehouse->id,
-                'transaction_id' => null,
-                'type' => 'in',
-                'quantity' => 20,
-                'movement_date' => now(),
-                'description' => 'Stok masuk awal dari data dummy.',
-            ]);
+            $stock->increment('quantity', $incomingQuantity);
+
+            StockMovement::updateOrCreate(
+                [
+                    'branch_id' => $stock->branch_id,
+                    'product_id' => $stock->product_id,
+                    'type' => 'in',
+                    'description' => 'Stok masuk awal dari data dummy.',
+                ],
+                [
+                    'user_id' => $warehouse->id,
+                    'transaction_id' => null,
+                    'quantity' => $incomingQuantity,
+                    'movement_date' => now()->subDays($index % 20),
+                ]
+            );
+
+            if ($index % 10 === 0) {
+                StockMovement::updateOrCreate(
+                    [
+                        'branch_id' => $stock->branch_id,
+                        'product_id' => $stock->product_id,
+                        'type' => 'adjustment',
+                        'description' => 'Adjustment stok dari pengecekan fisik.',
+                    ],
+                    [
+                        'user_id' => $warehouse->id,
+                        'transaction_id' => null,
+                        'quantity' => $stock->quantity,
+                        'movement_date' => now()->subDays($index % 10),
+                    ]
+                );
+            }
         }
     }
 }

@@ -16,13 +16,22 @@ class StockSeeder extends Seeder
 
         foreach ($branches as $branchIndex => $branch) {
             foreach ($products as $productIndex => $product) {
+                $baseQuantity = 60 + ($branchIndex * 15) + ($productIndex % 20);
+
+                $quantity = match (true) {
+                    $productIndex % 17 === 0 => 8,
+                    $productIndex % 13 === 0 => 15,
+                    $productIndex % 9 === 0 => 25,
+                    default => $baseQuantity,
+                };
+
                 Stock::updateOrCreate(
                     [
                         'branch_id' => $branch->id,
                         'product_id' => $product->id,
                     ],
                     [
-                        'quantity' => 80 + ($branchIndex * 10) + ($productIndex % 5),
+                        'quantity' => $quantity,
                         'minimum_stock' => 20,
                     ]
                 );

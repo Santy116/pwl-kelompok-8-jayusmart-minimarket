@@ -25,11 +25,12 @@ class TransactionSeeder extends Seeder
                 continue;
             }
 
-            for ($transactionNumber = 1; $transactionNumber <= 2; $transactionNumber++) {
+            for ($transactionNumber = 1; $transactionNumber <= 15; $transactionNumber++) {
                 $stocks = Stock::with('product')
                     ->where('branch_id', $branch->id)
-                    ->where('quantity', '>', 10)
-                    ->limit(3)
+                    ->where('quantity', '>', 25)
+                    ->inRandomOrder()
+                    ->limit(4)
                     ->get();
 
                 if ($stocks->isEmpty()) {
@@ -40,7 +41,7 @@ class TransactionSeeder extends Seeder
                 $totalAmount = 0;
 
                 foreach ($stocks as $index => $stock) {
-                    $quantity = $index + 1;
+                    $quantity = ($index % 3) + 1;
                     $price = $stock->product->selling_price;
                     $subtotal = $quantity * $price;
 
@@ -55,30 +56,41 @@ class TransactionSeeder extends Seeder
                     $totalAmount += $subtotal;
                 }
 
-                $paidAmount = $totalAmount + 10000;
+                $paidAmount = $totalAmount + (5000 * (($counter % 4) + 1));
+                $transactionDate = now()->subDays($counter % 30);
 
-                $transaction = Transaction::create([
-                    'branch_id' => $branch->id,
-                    'user_id' => $cashier->id,
-                    'invoice_number' => 'INV-SEED-'.str_pad((string) $counter, 5, '0', STR_PAD_LEFT),
-                    'transaction_date' => now()->subDays($counter),
-                    'total_amount' => $totalAmount,
-                    'paid_amount' => $paidAmount,
-                    'change_amount' => $paidAmount - $totalAmount,
-                    'payment_method' => $counter % 2 === 0 ? 'qris' : 'cash',
-                    'status' => 'paid',
-                ]);
+                $transaction = Transaction::updateOrCreate(
+                    [
+                        'invoice_number' => 'INV-SEED-'.str_pad((string) $counter, 5, '0', STR_PAD_LEFT),
+                    ],
+                    [
+                        'branch_id' => $branch->id,
+                        'user_id' => $cashier->id,
+                        'transaction_date' => $transactionDate,
+                        'total_amount' => $totalAmount,
+                        'paid_amount' => $paidAmount,
+                        'change_amount' => $paidAmount - $totalAmount,
+                        'payment_method' => $counter % 2 === 0 ? 'qris' : 'cash',
+                        'status' => 'paid',
+                    ]
+                );
 
                 foreach ($items as $item) {
-                    TransactionItem::create([
-                        'transaction_id' => $transaction->id,
-                        'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity'],
-                        'price' => $item['price'],
-                        'subtotal' => $item['subtotal'],
-                    ]);
+                    TransactionItem::updateOrCreate(
+                        [
+                            'transaction_id' => $transaction->id,
+                            'product_id' => $item['product_id'],
+                        ],
+                        [
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'subtotal' => $item['subtotal'],
+                        ]
+                    );
 
-                    $item['stock']->decrement('quantity', $item['quantity']);
+                    if ($item['stock']->quantity >= $item['quantity']) {
+                        $item['stock']->decrement('quantity', $item['quantity']);
+                    }
                 }
 
                 $counter++;
