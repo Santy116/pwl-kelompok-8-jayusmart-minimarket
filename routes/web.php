@@ -77,6 +77,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])
+        ->middleware('role:owner')
+        ->name('audit-logs.index');
 });
 
 require __DIR__.'/auth.php';

@@ -95,7 +95,6 @@ class TransactionController extends Controller
                     'payment_method' => $validated['payment_method'],
                     'status' => 'paid',
                 ]);
-
                 foreach ($validated['items'] as $item) {
                     $stock = Stock::where('branch_id', $validated['branch_id'])
                         ->where('product_id', $item['product_id'])
