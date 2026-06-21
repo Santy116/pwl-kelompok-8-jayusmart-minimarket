@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockMovement;
+use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,16 +83,17 @@ class StockController extends Controller
             ]);
         }
 
-        StockMovement::create([
+        $stockMovement = StockMovement::create([
             'branch_id' => $validated['branch_id'],
             'product_id' => $validated['product_id'],
-            'user_id' => $user->id,
-            'transaction_id' => null,
+            'user_id' => $request->user()->id,
             'type' => $validated['type'],
             'quantity' => $validated['quantity'],
             'movement_date' => $validated['movement_date'],
             'description' => $validated['description'] ?? null,
         ]);
+
+        AuditLogger::created($stockMovement);
 
         return redirect()
             ->route('stocks.index')
