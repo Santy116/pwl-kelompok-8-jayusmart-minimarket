@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             StockSeeder::class,
             TransactionSeeder::class,
             StockMovementSeeder::class,
+            AuditLogSeeder::class,
         ]);
     }
 }
