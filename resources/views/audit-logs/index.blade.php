@@ -1,6 +1,6 @@
-﻿<x-app-layout>
+<x-app-layout>
     <div class="space-y-6">
-        <div class="flex flex-col gap-1">
+        <div>
             <h1 class="text-2xl font-semibold text-gray-900">Audit Log</h1>
             <p class="text-sm text-gray-500">
                 Riwayat aktivitas pengguna pada sistem Jayusmart Minimarket.
@@ -102,33 +102,26 @@
                                 <td class="whitespace-nowrap px-4 py-3 text-gray-700">
                                     {{ $log->created_at->format('d M Y H:i') }}
                                 </td>
-
                                 <td class="px-4 py-3 text-gray-700">
                                     {{ $log->user?->name ?? '-' }}
                                 </td>
-
                                 <td class="px-4 py-3 text-gray-700">
                                     {{ ucfirst($log->role ?? '-') }}
                                 </td>
-
                                 <td class="px-4 py-3 text-gray-700">
                                     {{ $log->branch?->name ?? '-' }}
                                 </td>
-
                                 <td class="px-4 py-3">
                                     <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
                                         {{ strtoupper($log->action) }}
                                     </span>
                                 </td>
-
                                 <td class="px-4 py-3 text-gray-700">
                                     {{ $log->table_name }}
                                 </td>
-
                                 <td class="px-4 py-3 text-gray-700">
                                     #{{ $log->record_id ?? '-' }}
                                 </td>
-
                                 <td class="px-4 py-3 text-gray-700">
                                     {{ $log->ip_address ?? '-' }}
                                 </td>

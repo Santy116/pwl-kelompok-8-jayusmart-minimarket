@@ -16,8 +16,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])
+        ->middleware('role:owner')
+        ->name('audit-logs.index');
 
     Route::middleware(['role:owner'])->group(function () {
         Route::resource('branches', BranchController::class);

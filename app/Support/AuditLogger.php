@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class AuditLogger
 {
@@ -14,11 +15,11 @@ class AuditLogger
         ?array $oldValues = null,
         ?array $newValues = null
     ): void {
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             return;
         }
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         AuditLog::create([
             'user_id' => $user->id,
