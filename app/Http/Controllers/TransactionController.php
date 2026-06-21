@@ -9,6 +9,7 @@ use App\Models\Stock;
 use App\Models\StockMovement;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -94,7 +95,6 @@ class TransactionController extends Controller
                     'payment_method' => $validated['payment_method'],
                     'status' => 'paid',
                 ]);
-
                 foreach ($validated['items'] as $item) {
                     $stock = Stock::where('branch_id', $validated['branch_id'])
                         ->where('product_id', $item['product_id'])
@@ -127,6 +127,8 @@ class TransactionController extends Controller
                         'description' => 'Stok keluar dari transaksi penjualan.',
                     ]);
                 }
+
+                AuditLogger::created($transaction);
 
                 return $transaction;
             });
