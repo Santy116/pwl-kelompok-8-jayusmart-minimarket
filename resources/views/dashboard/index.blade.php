@@ -5,6 +5,7 @@
 
         {{-- Header: tombol aksi saja, judul sudah ada di navbar --}}
         <div class="flex justify-end gap-2">
+            @hasanyrole('owner|manager|supervisor')
             <a href="{{ route('reports.transactions') }}"
                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,7 +14,9 @@
                 </svg>
                 Laporan Transaksi
             </a>
+            @endhasanyrole
 
+            @hasanyrole('owner|manager|supervisor|warehouse')
             <a href="{{ route('reports.stocks') }}"
                class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,6 +25,7 @@
                 </svg>
                 Laporan Stok
             </a>
+            @endhasanyrole
         </div>
 
         {{-- Stat Cards --}}
