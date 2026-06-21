@@ -110,6 +110,18 @@
             </a>
         @endif
 
+        @role('owner')
+            <a href="{{ route('audit-logs.index') }}"
+                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 {{ request()->routeIs('audit-logs.*') ? 'bg-gray-100 text-gray-900' : '' }}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h6m-6 4h6M7 4h10a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2Z" />
+                </svg>
+                <span>Audit Log</span>
+            </a>
+        @endrole
+
         {{-- Logout --}}
         <div class="pt-2 mt-2 border-t border-slate-800">
             <form method="POST" action="{{ route('logout') }}">

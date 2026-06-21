@@ -9,6 +9,7 @@ use App\Models\Stock;
 use App\Models\StockMovement;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -116,7 +117,7 @@ class TransactionController extends Controller
 
                     $stock->decrement('quantity', $item['quantity']);
 
-                    StockMovement::create([
+                    $stockMovement = StockMovement::create([
                         'branch_id' => $validated['branch_id'],
                         'product_id' => $item['product_id'],
                         'user_id' => $request->user()->id,
@@ -126,7 +127,11 @@ class TransactionController extends Controller
                         'movement_date' => $validated['transaction_date'],
                         'description' => 'Stok keluar dari transaksi penjualan.',
                     ]);
+
+                    AuditLogger::created($stockMovement);
                 }
+
+                AuditLogger::created($transaction);
 
                 return $transaction;
             });

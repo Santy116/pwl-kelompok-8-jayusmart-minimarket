@@ -6,6 +6,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,7 +44,9 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        Product::create($request->validated());
+        $product = Product::create($request->validated());
+
+        AuditLogger::created($product);
 
         return redirect()
             ->route('products.index')
@@ -69,7 +72,11 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
+        $oldData = $product->toArray();
+
         $product->update($request->validated());
+
+        AuditLogger::updated($product, $oldData);
 
         return redirect()
             ->route('products.index')
@@ -78,6 +85,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        AuditLogger::deleted($product);
+
         $product->delete();
 
         return redirect()
